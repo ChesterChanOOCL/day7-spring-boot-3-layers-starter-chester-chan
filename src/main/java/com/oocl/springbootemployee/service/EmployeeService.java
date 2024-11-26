@@ -9,6 +9,7 @@ import java.util.List;
 @Service
 public class EmployeeService {
     private final IEmployeeRepository employeeRepository;
+
     public EmployeeService(IEmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
     }
@@ -17,7 +18,14 @@ public class EmployeeService {
         return employeeRepository.getAll();
     }
 
-    public Employee creat(Employee employee) {
+    public Employee create(Employee employee) throws EmployeeAgeNotValidException, EmployeeNotEnoughSalaryException {
+        if(employee.getAge() < 18 || employee.getAge() > 60){
+            throw new EmployeeAgeNotValidException("Employee Age Not Valid");
+        }
+        if (employee.getAge() > 30 && employee.getSalary() < 20000){
+            throw new EmployeeNotEnoughSalaryException("Employee Salary Not enough for this age");
+          }
+
         return employeeRepository.addEmployee(employee);
     }
 
@@ -33,4 +41,5 @@ public class EmployeeService {
 
         return employeeRepository.updateEmployee(employeeId, employeeToUpdate);
     }
+
 }

@@ -6,7 +6,7 @@ public class Employee {
     private Integer age;
     private Gender gender;
     private Double salary;
-
+    private boolean isActive;
     public Employee(Integer id, String name, Integer age, Gender gender, Double salary) {
 
         this.id = id;
@@ -14,6 +14,11 @@ public class Employee {
         this.age = age;
         this.gender = gender;
         this.salary = salary;
+        this.isActive = true;
+    }
+
+    public boolean isActive() {
+        return isActive;
     }
 
     public Integer getId() {

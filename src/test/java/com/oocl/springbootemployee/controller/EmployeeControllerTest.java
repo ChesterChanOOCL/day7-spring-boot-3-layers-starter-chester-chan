@@ -3,12 +3,16 @@ package com.oocl.springbootemployee.controller;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 
 import com.oocl.springbootemployee.model.Employee;
 import com.oocl.springbootemployee.model.Gender;
 import com.oocl.springbootemployee.repository.EmployeeRepository;
+import com.oocl.springbootemployee.service.EmployeeInactiveException;
+import com.oocl.springbootemployee.service.EmployeeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -212,4 +216,67 @@ class EmployeeControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].gender").value(givenEmployees.get(2).getGender().name()))
             .andExpect(MockMvcResultMatchers.jsonPath("$[0].salary").value(givenEmployees.get(2).getSalary()));
     }
+
+
+    @Test
+    void should_return_employee_active_when_create_employee() throws Exception {
+        // Given
+        // Given
+
+
+
+
+        Integer givenId = 1;
+        String givenName = "New Employee";
+        Integer givenAge = 30;
+        Gender givenGender = Gender.FEMALE;
+        Double givenSalary = 5432.0;
+        String givenEmployee = String.format(
+                "{\"id\": %s, \"name\": \"%s\", \"age\": \"%s\", \"gender\": \"%s\", \"salary\": \"%s\"}",
+                givenId,
+                givenName,
+                givenAge,
+                givenGender,
+                givenSalary
+        );
+
+        // When
+        // Then
+        client.perform(MockMvcRequestBuilders.put("/employees/" + givenId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(givenEmployee)
+                )
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").isNumber())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(givenName))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.age").value(givenAge))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.gender").value(givenGender.name()))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.salary").value(givenSalary));
+        List<Employee> employees = employeeRepository.getAll();
+        assertThat(employees).hasSize(5);
+        assertThat(employees.get(0).getId()).isEqualTo(1);
+        assertThat(employees.get(0).getName()).isEqualTo(givenName);
+        assertThat(employees.get(0).getAge()).isEqualTo(givenAge);
+        assertThat(employees.get(0).getGender()).isEqualTo(givenGender);
+        assertThat(employees.get(0).getSalary()).isEqualTo(givenSalary);
+
+
+
+    }
+
+    // a test should return av
+    @Test
+    void should_throw_EmployeeInActiveException_when_update_given_an_inactive_employee (){
+        EmployeeRepository  mockEmployeeRepository = mock(EmployeeRepository.class);
+        EmployeeService employeeService = new EmployeeService(mockEmployeeRepository);
+        //Default employee is inActive
+        Employee inactiveEmployee = new Employee(1, "Lucy", 18, Gender.FEMALE, 8000.0);
+        when(mockEmployeeRepository.getEmployeeById(1)).thenReturn(inactiveEmployee);
+        assertThrows(EmployeeInactiveException.class, () -> employeeService.update(1, inactiveEmployee));
+        verify(mockEmployeeRepository, never()).updateEmployee(any(), any());
+
+    }
+
+
+
 }
