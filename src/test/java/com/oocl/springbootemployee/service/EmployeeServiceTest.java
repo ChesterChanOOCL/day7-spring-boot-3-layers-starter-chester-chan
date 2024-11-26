@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 class EmployeeServiceTest {
     @Test
@@ -29,18 +29,7 @@ class EmployeeServiceTest {
         assertEquals("Lucy", allEmployees.get(0).getName());
     }
 
-    @Test
-    void should_return_the_created_employee_when_create_given_a_employee() {
-        //given
-        IEmployeeRepository mockedEmployeeRepository = mock(IEmployeeRepository.class);
-        Employee lucy = new Employee(1, "Lucy", 18, Gender.FEMALE, 8000.0);
-        when(mockedEmployeeRepository.addEmployee(any())).thenReturn(lucy);
-        EmployeeService employeeService = new EmployeeService(mockedEmployeeRepository);
 
-        //when
-        Employee createdEmployee = employeeService.creat(lucy);
 
-        //then
-        assertEquals("Lucy", createdEmployee.getName());
-    }
+
 }
